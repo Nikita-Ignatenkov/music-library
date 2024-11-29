@@ -11,16 +11,20 @@ import (
 var DB *gorm.DB
 
 func ConnectDatabase() {
+	log.Println("DEBUG: Attempting to connect to the database...")
 	var err error
 	dsn := config.GetDatabaseURL()
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatal("ERROR: Failed to connect to database:", err)
 	}
+	log.Println("INFO: Successfully connected to the database.")
 
-	// Автоматически мигрируем изменения в структуре
+	// Авто мигр
+	log.Println("DEBUG: Running database migrations...")
 	err = DB.AutoMigrate(&models.Song{})
 	if err != nil {
-		log.Fatal("Failed to migrate database:", err)
+		log.Fatal("ERROR: Failed to migrate database:", err)
 	}
+	log.Println("INFO: Database migration completed successfully.")
 }
