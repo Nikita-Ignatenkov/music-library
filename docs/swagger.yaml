@@ -1,0 +1,208 @@
+definitions:
+  models.ErrorResponse:
+    description: Структура ответа для ошибок API.
+    properties:
+      code:
+        description: Код ошибки
+        type: integer
+      message:
+        description: Сообщение об ошибке
+        type: string
+    type: object
+  models.Song:
+    description: Структура песни
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      group:
+        description: Группа или исполнитель
+        type: string
+      id:
+        type: integer
+      link:
+        description: Ссылка на песню
+        type: string
+      releaseDate:
+        description: Дата релиза
+        type: string
+      song:
+        description: Название песни
+        type: string
+      text:
+        description: Текст песни
+        type: string
+      updatedAt:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /songs:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of songs based on optional group and song name
+        filters, with pagination support using limit and offset parameters.
+      parameters:
+      - description: Group name (artist)
+        in: query
+        name: group
+        type: string
+      - description: Song name
+        in: query
+        name: song
+        type: string
+      - description: Limit the number of songs returned
+        in: query
+        name: limit
+        type: integer
+      - description: Offset the returned songs by this amount
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Song'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get a list of songs
+    post:
+      consumes:
+      - application/json
+      description: Добавляет новую песню в базу данных, сначала запрашивая информацию
+        из внешнего API.
+      parameters:
+      - description: Данные о песне
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.Song'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Добавленная песня
+          schema:
+            $ref: '#/definitions/models.Song'
+        "400":
+          description: Ошибка в запросе
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Добавление новой песни
+  /songs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет песню из базы данных по указанному идентификатору.
+      parameters:
+      - description: ID песни
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Песня успешно удалена
+        "400":
+          description: Ошибка в запросе
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Песня не найдена
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Удаление песни по ID
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные песни в базе данных по указанному идентификатору.
+      parameters:
+      - description: ID песни
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Данные песни для обновления
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.Song'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Песня успешно обновлена
+        "400":
+          description: Ошибка в запросе
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Песня не найдена
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Обновление песни по ID
+  /songs/{id}/text:
+    get:
+      consumes:
+      - application/json
+      description: Получает текст песни по ее идентификатору и поддерживает пагинацию
+        для возвращения определённого количества куплетов на странице.
+      parameters:
+      - description: ID песни
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Номер страницы для получения (индексация с единицы)
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список куплетов
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Неверный запрос, ошибка в параметрах
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Песня не найдена
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Получение текста песни с пагинацией по куплетам
+swagger: "2.0"

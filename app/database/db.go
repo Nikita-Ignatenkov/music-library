@@ -20,7 +20,7 @@ func ConnectDatabase() {
 	}
 	log.Println("INFO: Successfully connected to the database.")
 
-	// Авто мигр
+	// Автомиграция
 	log.Println("DEBUG: Running database migrations...")
 	err = DB.AutoMigrate(&models.Song{})
 	if err != nil {
